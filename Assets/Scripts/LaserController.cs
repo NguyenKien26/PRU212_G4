@@ -1,0 +1,20 @@
+using UnityEngine;
+
+public class LaserController : MonoBehaviour
+{
+    public float laserSpeed = 25f;
+    void Update()
+    {
+        transform.Translate(Vector3.up * laserSpeed * Time.deltaTime);   
+    }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(collision.gameObject.tag == "Asteroids")
+        {
+            GameObject gm = Instantiate(GameManager.instance.explosion, transform.position, transform.rotation);
+            Destroy(gm, 2f);
+            Destroy(this.gameObject);
+            Destroy(collision.gameObject);
+        }
+    }
+}
