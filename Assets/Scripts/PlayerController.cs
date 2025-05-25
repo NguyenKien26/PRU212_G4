@@ -1,7 +1,12 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 
 public class PlayerController : MonoBehaviour
 {
+    public static bool isGameOver;
+    public GameObject gameOverScreen;
+
     public float speed = 10f;
 
     [Header("Laser")]
@@ -9,11 +14,23 @@ public class PlayerController : MonoBehaviour
     public Transform laserSpawnPosition;
     public float destroyTime = 5f;
     public Transform muzzleSpawnPosition;
+
+    private void Awake()
+    {
+        isGameOver = false;
+        if (gameOverScreen != null)
+            gameOverScreen.SetActive(false);
+    }
+
     private void Update()
     {
+        if (isGameOver)
+            return;
+
         PlayrMovement();
         PlayrShoot();
     }
+
     void PlayrMovement()
     {
         float xPos = Input.GetAxis("Horizontal");
@@ -21,6 +38,7 @@ public class PlayerController : MonoBehaviour
         Vector3 movement = new Vector3(xPos, yPos, 0) * speed * Time.deltaTime;
         transform.Translate(movement);
     }
+
     void PlayrShoot()
     {
         if (Input.GetKeyDown(KeyCode.Space))
@@ -29,25 +47,38 @@ public class PlayerController : MonoBehaviour
             SpawnMuzzleFlash();
         }
     }
+
     void SpawnLaser()
     {
         GameObject gm = Instantiate(laser, laserSpawnPosition);
         gm.transform.SetParent(null);
         Destroy(gm, destroyTime);
     }
+
     void SpawnMuzzleFlash()
     {
         GameObject muzzle = Instantiate(GameManager.instance.muzzleFlash, muzzleSpawnPosition);
         muzzle.transform.SetParent(null);
         Destroy(muzzle, destroyTime);
     }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.gameObject.tag == "Asteroids")
+        if (collision.gameObject.tag == "Asteroids" && !isGameOver)
         {
+            isGameOver = true;
+
             GameObject gm = Instantiate(GameManager.instance.explosion, transform.position, transform.rotation);
             Destroy(gm, 2f);
+
+            if (gameOverScreen != null)
+                gameOverScreen.SetActive(true);
+
             Destroy(this.gameObject);
         }
+    }
+    public void ReplayGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
