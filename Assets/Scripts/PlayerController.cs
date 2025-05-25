@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 
@@ -74,7 +74,8 @@ public class PlayerController : MonoBehaviour
             if (gameOverScreen != null)
                 gameOverScreen.SetActive(true);
 
-            Destroy(this.gameObject);
+            // Thay vì Destroy Player, ta chỉ ẩn Player
+            gameObject.SetActive(false);
         }
     }
     public void ReplayGame()
