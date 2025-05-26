@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 3
   tags:
   - Asteroids
+  - Projectile
+  - Enemy
+  - Item
   layers:
   - Default
   - TransparentFX

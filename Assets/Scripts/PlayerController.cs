@@ -1,8 +1,9 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
     public float speed = 10f;
+    public int score = 0;
 
     [Header("Laser")]
     public GameObject laser;
@@ -31,7 +32,9 @@ public class PlayerController : MonoBehaviour
     }
     void SpawnLaser()
     {
-        GameObject gm = Instantiate(laser, laserSpawnPosition);
+        Vector3 spawnOffset = laserSpawnPosition.up * 0.5f;
+        //GameObject gm = Instantiate(laser, laserSpawnPosition);
+        GameObject gm = Instantiate(laser, laserSpawnPosition.position + spawnOffset, laserSpawnPosition.rotation);
         gm.transform.SetParent(null);
         Destroy(gm, destroyTime);
     }
@@ -43,11 +46,23 @@ public class PlayerController : MonoBehaviour
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.gameObject.tag == "Asteroids")
+        if (collision.gameObject.CompareTag("Asteroids") || collision.gameObject.CompareTag("Enemy"))
         {
             GameObject gm = Instantiate(GameManager.instance.explosion, transform.position, transform.rotation);
             Destroy(gm, 2f);
-            Destroy(this.gameObject);
+            Destroy(collision.gameObject); // Phá hủy enemy/asteroid
+            Destroy(this.gameObject);      // Player chết
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "Item")
+        {
+            GameObject gm = Instantiate(GameManager.instance.explosion, transform.position, transform.rotation);
+            Destroy(gm, 2f);
+            score += 10;
+            Destroy(collision.gameObject); // Chỉ item biến mất
         }
     }
 }
