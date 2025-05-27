@@ -13,8 +13,8 @@ public class PlayerController : MonoBehaviour
     public float speed = 10f;
 
     [Header("Audio")]
-    public AudioClip gameOverClip;      // 👉 Kéo file âm thanh vào đây trong Inspector
-    private AudioSource audioSource;    // 👉 Bộ phát âm thanh
+    public AudioClip gameOverClip;
+    private AudioSource audioSource;
 
 
     [Header("Laser")]
@@ -41,7 +41,7 @@ public class PlayerController : MonoBehaviour
         sr = GetComponent<SpriteRenderer>();
         col = GetComponent<Collider2D>();
 
-        audioSource = GetComponent<AudioSource>(); // 🔊 Thêm dòng này để gán AudioSource
+        audioSource = GetComponent<AudioSource>();
 
         if (gameOverScreen != null)
             gameOverScreen.SetActive(false);
@@ -93,7 +93,6 @@ public class PlayerController : MonoBehaviour
                 GameObject exp = Instantiate(GameManager.instance.explosion, transform.position, Quaternion.identity);
                 Destroy(exp, 2f);
 
-                // 👉 Phát âm thanh Game Over
                 if (gameOverClip != null && audioSource != null)
                     audioSource.PlayOneShot(gameOverClip);
 
@@ -114,26 +113,21 @@ public class PlayerController : MonoBehaviour
     {
         isInvincible = true;
 
-        // Nổ hiệu ứng
         GameObject explosion = Instantiate(GameManager.instance.explosion, transform.position, Quaternion.identity);
         Destroy(explosion, 2f);
 
-        // Ẩn player tạm thời
         sr.enabled = false;
         col.enabled = false;
 
-        yield return new WaitForSeconds(1f); // delay ẩn player
+        yield return new WaitForSeconds(1f);
 
-        // Hồi sinh vị trí ban đầu
         transform.position = respawnPosition;
 
-        // Hiện player và tắt collider trước nhấp nháy
         sr.enabled = true;
         col.enabled = false;
 
-        // Nhấp nháy 5 lần
         Color originalColor = sr.color;
-        int blinkCount = 5;       // tăng lên 5 lần
+        int blinkCount = 5;
         float blinkTime = 0.2f;
 
         for (int i = 0; i < blinkCount; i++)
@@ -144,7 +138,6 @@ public class PlayerController : MonoBehaviour
             yield return new WaitForSeconds(blinkTime);
         }
 
-        // Bật lại collider sau khi nhấp nháy xong
         col.enabled = true;
 
         isInvincible = false;
