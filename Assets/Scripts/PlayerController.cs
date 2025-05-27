@@ -169,4 +169,10 @@ public class PlayerController : MonoBehaviour
         if (gamePauseScreen != null)
             gamePauseScreen.SetActive(false);
     }
+    public void MenuGame()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
+
+
 }

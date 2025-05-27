@@ -1,10 +1,22 @@
 fileFormatVersion: 2
-guid: bf0d5044f6de5eb4cb067fca36ea2049
+guid: eedc341e4aa12324d8771caf8ad5892e
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7762350047352875558
-    second: Pause_0
+      213: -5875664993436489352
+    second: "t\u1EA3i xu\u1ED1ng_0"
+  - first:
+      213: 3527621641941133318
+    second: "t\u1EA3i xu\u1ED1ng_1"
+  - first:
+      213: -1232081820180879709
+    second: "t\u1EA3i xu\u1ED1ng_2"
+  - first:
+      213: 6809726895281458126
+    second: "t\u1EA3i xu\u1ED1ng_3"
+  - first:
+      213: 3634716173065306058
+    second: "t\u1EA3i xu\u1ED1ng_4"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +125,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Pause_0
+      name: "t\u1EA3i xu\u1ED1ng_0"
       rect:
         serializedVersion: 2
-        x: 53
-        y: 129
-        width: 400
-        height: 168
+        x: 91
+        y: 142
+        width: 242
+        height: 224
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +140,96 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: ad59b4532c7964490800000000000000
-      internalID: -7762350047352875558
+      spriteID: 879250fa1d1757ea0800000000000000
+      internalID: -5875664993436489352
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "t\u1EA3i xu\u1ED1ng_1"
+      rect:
+        serializedVersion: 2
+        x: 109
+        y: 29
+        width: 50
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 608a1e57131a4f030800000000000000
+      internalID: 3527621641941133318
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "t\u1EA3i xu\u1ED1ng_2"
+      rect:
+        serializedVersion: 2
+        x: 161
+        y: 29
+        width: 50
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a6e6e5cc14c6eee0800000000000000
+      internalID: -1232081820180879709
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "t\u1EA3i xu\u1ED1ng_3"
+      rect:
+        serializedVersion: 2
+        x: 213
+        y: 29
+        width: 51
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ecbcca22882018e50800000000000000
+      internalID: 6809726895281458126
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "t\u1EA3i xu\u1ED1ng_4"
+      rect:
+        serializedVersion: 2
+        x: 266
+        y: 29
+        width: 50
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: acfbce21a1b117230800000000000000
+      internalID: 3634716173065306058
       vertices: []
       indices: 
       edges: []
@@ -147,7 +247,12 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      "t\u1EA3i xu\u1ED1ng_0": -5875664993436489352
+      "t\u1EA3i xu\u1ED1ng_1": 3527621641941133318
+      "t\u1EA3i xu\u1ED1ng_2": -1232081820180879709
+      "t\u1EA3i xu\u1ED1ng_3": 6809726895281458126
+      "t\u1EA3i xu\u1ED1ng_4": 3634716173065306058
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
