@@ -2,24 +2,26 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+
 public class PlayerController : MonoBehaviour
 {
     public static bool isGameOver;
 
-    [SerializeField] private GameObject gameOverScreen;
-    [SerializeField] private GameObject gamePauseScreen;
+    public GameObject gameOverScreen;
+    public GameObject gamePauseScreen;
 
-    [SerializeField] private float speed = 10f;
+    public float speed = 10f;
 
     [Header("Audio")]
-    [SerializeField] private AudioClip gameOverClip;
+    public AudioClip gameOverClip;
     private AudioSource audioSource;
 
+
     [Header("Laser")]
-    [SerializeField] private GameObject laser;
-    [SerializeField] private Transform laserSpawnPosition;
-    [SerializeField] private float destroyTime = 5f;
-    [SerializeField] private Transform muzzleSpawnPosition;
+    public GameObject laser;
+    public Transform laserSpawnPosition;
+    public float destroyTime = 5f;
+    public Transform muzzleSpawnPosition;
 
     private bool isInvincible = false;
     private Vector3 respawnPosition;
@@ -30,31 +32,21 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
-        if (rb != null)
-        {
-            rb.freezeRotation = true;
-        }
-        else
-        {
-            Debug.LogError("PlayerController: Thiếu Rigidbody2D!");
-        }
+        rb.freezeRotation = true;
 
         isGameOver = false;
+
         respawnPosition = transform.position;
 
         sr = GetComponent<SpriteRenderer>();
         col = GetComponent<Collider2D>();
-        audioSource = GetComponent<AudioSource>();
 
-        if (sr == null) Debug.LogError("PlayerController: Thiếu SpriteRenderer!");
-        if (col == null) Debug.LogError("PlayerController: Thiếu Collider2D!");
-        if (audioSource == null) Debug.LogError("PlayerController: Thiếu AudioSource!");
+        audioSource = GetComponent<AudioSource>();
 
         if (gameOverScreen != null)
             gameOverScreen.SetActive(false);
-        else
-            Debug.LogWarning("Game Over Screen chưa được gán!");
     }
+
 
     private void Update()
     {
@@ -68,7 +60,8 @@ public class PlayerController : MonoBehaviour
     void PlayrMovement()
     {
         float xPos = Input.GetAxis("Horizontal");
-        Vector3 movement = new Vector3(xPos, 0, 0) * speed * Time.deltaTime;
+        float yPos = Input.GetAxis("Vertical");
+        Vector3 movement = new Vector3(xPos, yPos, 0) * speed * Time.deltaTime;
         transform.Translate(movement);
     }
 
@@ -76,27 +69,11 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (laser != null && laserSpawnPosition != null)
-            {
-                GameObject gm = Instantiate(laser, laserSpawnPosition.position, Quaternion.identity);
-                Destroy(gm, destroyTime);
-                Debug.Log($"Đã bắn laser tại {laserSpawnPosition.position}.");
-            }
-            else
-            {
-                Debug.LogError("Laser Prefab hoặc Laser Spawn Position chưa được gán!");
-            }
+            GameObject gm = Instantiate(laser, laserSpawnPosition.position, Quaternion.identity);
+            Destroy(gm, destroyTime);
 
-            if (GameManager.instance != null && GameManager.instance.muzzleFlash != null && muzzleSpawnPosition != null)
-            {
-                GameObject muzzle = Instantiate(GameManager.instance.muzzleFlash, muzzleSpawnPosition.position, Quaternion.identity);
-                Destroy(muzzle, destroyTime);
-                Debug.Log("Đã tạo hiệu ứng muzzle flash.");
-            }
-            else
-            {
-                Debug.LogError("Muzzle Flash hoặc Muzzle Spawn Position chưa được gán!");
-            }
+            GameObject muzzle = Instantiate(GameManager.instance.muzzleFlash, muzzleSpawnPosition.position, Quaternion.identity);
+            Destroy(muzzle, destroyTime);
         }
     }
 
@@ -113,11 +90,8 @@ public class PlayerController : MonoBehaviour
             {
                 isGameOver = true;
 
-                if (GameManager.instance != null && GameManager.instance.explosion != null)
-                {
-                    GameObject exp = Instantiate(GameManager.instance.explosion, transform.position, Quaternion.identity);
-                    Destroy(exp, 2f);
-                }
+                GameObject exp = Instantiate(GameManager.instance.explosion, transform.position, Quaternion.identity);
+                Destroy(exp, 2f);
 
                 if (gameOverClip != null && audioSource != null)
                     audioSource.PlayOneShot(gameOverClip);
@@ -127,6 +101,7 @@ public class PlayerController : MonoBehaviour
 
                 gameObject.SetActive(false);
             }
+
             else
             {
                 StartCoroutine(GetHurt());
@@ -138,11 +113,8 @@ public class PlayerController : MonoBehaviour
     {
         isInvincible = true;
 
-        if (GameManager.instance != null && GameManager.instance.explosion != null)
-        {
-            GameObject explosion = Instantiate(GameManager.instance.explosion, transform.position, Quaternion.identity);
-            Destroy(explosion, 2f);
-        }
+        GameObject explosion = Instantiate(GameManager.instance.explosion, transform.position, Quaternion.identity);
+        Destroy(explosion, 2f);
 
         sr.enabled = false;
         col.enabled = false;
@@ -167,8 +139,10 @@ public class PlayerController : MonoBehaviour
         }
 
         col.enabled = true;
+
         isInvincible = false;
     }
+
 
     public void ReplayGame()
     {
@@ -188,9 +162,10 @@ public class PlayerController : MonoBehaviour
         if (gamePauseScreen != null)
             gamePauseScreen.SetActive(false);
     }
-
     public void MenuGame()
     {
         SceneManager.LoadScene("MainMenu");
     }
+
+
 }

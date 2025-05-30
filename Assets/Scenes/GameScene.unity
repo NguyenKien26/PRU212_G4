@@ -2147,8 +2147,6 @@ MonoBehaviour:
   asteroidDestroyTime: 10
   explosion: {fileID: 100002, guid: cafecd3fc3b761c45bb1553f35cf5c96, type: 3}
   muzzleFlash: {fileID: 100002, guid: 565cdc2ed7b030a41accd8f00ae59a50, type: 3}
-  starPrefab: {fileID: 1851433225761717021, guid: 100fb899cf4b2ff49a9e117fe35ffdf4, type: 3}
-  starSpawnChance: 1
 --- !u!4 &1826488447
 Transform:
   m_ObjectHideFlags: 0
