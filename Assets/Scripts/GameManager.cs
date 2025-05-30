@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
@@ -11,6 +11,10 @@ public class GameManager : MonoBehaviour
     [Header("Particle Effects")]
     public GameObject explosion;
     public GameObject muzzleFlash;
+    [SerializeField] public GameObject starPrefab; // Prefab cho ngôi sao
+
+    [Header("Star Settings")]
+    [SerializeField] private float starSpawnChance = 1f;
 
     public void Awake()
     {
@@ -28,4 +32,22 @@ public class GameManager : MonoBehaviour
         GameObject asteroid = Instantiate(asteroidPrefab, asteroidpos, Quaternion.identity);
         Destroy(asteroid, asteroidDestroyTime);
     }
+    public void AsteroidDestroyed(Vector3 position)
+    {
+        Debug.Log("Asteroid destroyed at position: " + position);
+
+        if (starPrefab != null)
+        {
+            GameObject star = Instantiate(starPrefab, position, Quaternion.identity);
+            star.GetComponent<Collider2D>().isTrigger = true; // Đảm bảo có thể nhặt ngôi sao
+            Debug.Log("Star spawned at position: " + position);
+        }
+        else
+        {
+            Debug.LogError("starPrefab is NULL! Ensure it is assigned in Inspector.");
+        }
+
+        //AddScore(5);
+    }
+
 }
