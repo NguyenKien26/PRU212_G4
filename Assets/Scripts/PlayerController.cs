@@ -48,7 +48,7 @@ public class PlayerController : MonoBehaviour
 
         if (sr == null) Debug.LogError("PlayerController: Thiếu SpriteRenderer!");
         if (col == null) Debug.LogError("PlayerController: Thiếu Collider2D!");
-        if (audioSource == null) Debug.LogError("PlayerController: Thiếu AudioSource!");
+        //if (audioSource == null) Debug.LogError("PlayerController: Thiếu AudioSource!");
 
         if (gameOverScreen != null)
             gameOverScreen.SetActive(false);
@@ -105,7 +105,7 @@ public class PlayerController : MonoBehaviour
         if (isGameOver || isInvincible)
             return;
 
-        if (collision.gameObject.CompareTag("Asteroids"))
+        if (collision.gameObject.CompareTag("Asteroids") || collision.gameObject.CompareTag("Enemy"))
         {
             HeartManager.life--;
 
@@ -192,5 +192,15 @@ public class PlayerController : MonoBehaviour
     public void MenuGame()
     {
         SceneManager.LoadScene("MainMenu");
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Star"))
+        {
+            Destroy(collision.gameObject); // Chỉ xóa star
+            Debug.Log("Player collected a star!");
+            // Nếu bạn muốn tăng điểm, thêm logic ở đây
+        }
     }
 }
