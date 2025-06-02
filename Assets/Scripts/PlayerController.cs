@@ -5,22 +5,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using Assets.Scripts;
 
-[Serializable]
-public class PlayerScoreData
-{
-    public string Username;
-    public int Level;
-    public int Score;
-}
-
-[Serializable]
-public class HighScoreData
-{
-    public string Username;
-    public int Level;
-    public int Score;
-}
 
 public class PlayerController : MonoBehaviour
 {
