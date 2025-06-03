@@ -4,7 +4,8 @@ using UnityEngine.SceneManagement;
 public class MenuManager : MonoBehaviour
 {
     public GameObject instructionsPanel; // Gán từ Inspector
-    public GameObject instructionButton; 
+    public GameObject instructionButton;
+    public GameObject settingPopup;
 
     public void StartGame()
     {
@@ -22,12 +23,8 @@ public class MenuManager : MonoBehaviour
         instructionsPanel.SetActive(false);
         instructionButton.SetActive(true);
     }
-
-    public void QuitGame()
+    public void ShowSettingPopup()
     {
-        Application.Quit();
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false; //stop play mode
-#endif
+        settingPopup.SetActive(true);
     }
 }
