@@ -31,6 +31,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AudioClip hurtClip;
     [SerializeField] private AudioClip asteroidExplosionClip;
     [SerializeField] private AudioClip killEnermyClip;
+    [SerializeField] private AudioClip starCollectClip;
+    [SerializeField] private AudioClip engineClip;
+
+    private AudioSource engineAudioSource;
     private AudioSource audioSource;
 
     [Header("Laser")]
@@ -60,7 +64,7 @@ public class PlayerController : MonoBehaviour
     {
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
         if (rb != null) rb.freezeRotation = true;
-        else Debug.LogError("PlayerController: Rigidbody2D component is missing!");
+        else Debug.LogError("PlayerController: Rigidbody2D missing!");
 
         isGameOver = false;
         respawnPosition = transform.position;
@@ -69,24 +73,24 @@ public class PlayerController : MonoBehaviour
         col = GetComponent<Collider2D>();
         audioSource = GetComponent<AudioSource>();
 
-        if (sr == null) Debug.LogError("PlayerController: SpriteRenderer component is missing!");
-        if (col == null) Debug.LogError("PlayerController: Collider2D component is missing!");
+        if (sr == null) Debug.LogError("SpriteRenderer missing!");
+        if (col == null) Debug.LogError("Collider2D missing!");
         if (audioSource == null)
         {
             audioSource = gameObject.AddComponent<AudioSource>();
-            Debug.LogWarning("PlayerController: AudioSource component is missing, automatically added.");
+            Debug.LogWarning("AudioSource auto-added.");
         }
 
+        // Setup engine audio
+        engineAudioSource = gameObject.AddComponent<AudioSource>();
+        engineAudioSource.clip = engineClip;
+        engineAudioSource.loop = true;
+        engineAudioSource.playOnAwake = false;
+        if (engineClip != null) engineAudioSource.Play(); engineAudioSource.Pause();
+
         if (gameOverScreen != null) gameOverScreen.SetActive(false);
-        else Debug.LogWarning("Game Over Screen GameObject is not assigned!");
-
         if (gamePauseScreen != null) gamePauseScreen.SetActive(false);
-        else Debug.LogWarning("Game Pause Screen GameObject is not assigned!");
-
-        // Khởi tạo trạng thái của newRecordUI
-        if (newRecordUI != null) newRecordUI.gameObject.SetActive(false); // Đảm bảo ban đầu nó ẩn
-        else Debug.LogWarning("New Record UI Text (TMP_Text) is not assigned!");
-
+        if (newRecordUI != null) newRecordUI.gameObject.SetActive(false);
 
         username = SystemInfo.deviceName;
         if (string.IsNullOrEmpty(username)) username = "You";
@@ -106,19 +110,35 @@ public class PlayerController : MonoBehaviour
     private void PlayrMovement()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
-        Vector3 movement = new Vector3(horizontalInput, 0, 0) * speed * Time.deltaTime;
+        float verticalInput = Input.GetAxis("Vertical");
+        Vector3 movement = new Vector3(horizontalInput, verticalInput, 0) * speed * Time.deltaTime;
         transform.Translate(movement);
+
+        // Engine sound control
+        if (engineAudioSource != null)
+        {
+            if (movement.magnitude > 0.01f)
+            {
+                if (!engineAudioSource.isPlaying) engineAudioSource.UnPause();
+            }
+            else
+            {
+                if (engineAudioSource.isPlaying) engineAudioSource.Pause();
+            }
+        }
     }
+
 
     private void PlayrShoot()
     {
+        if (!sr.enabled) return; // Nếu nhân vật chưa hồi sinh xong không cho bắn 
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
             if (laser != null && laserSpawnPosition != null)
             {
                 GameObject laserInstance = Instantiate(laser, laserSpawnPosition.position, Quaternion.identity);
                 Destroy(laserInstance, destroyTime);
-                Debug.Log($"Laser fired at {laserSpawnPosition.position}.");
                 if (lazerClip != null && audioSource != null)
                     audioSource.PlayOneShot(lazerClip);
             }
@@ -128,11 +148,11 @@ public class PlayerController : MonoBehaviour
             {
                 GameObject muzzleFlashInstance = Instantiate(GameManager.instance.muzzleFlash, muzzleSpawnPosition.position, Quaternion.identity);
                 Destroy(muzzleFlashInstance, destroyTime);
-                Debug.Log("Muzzle flash effect created.");
             }
             else Debug.LogError("Muzzle Flash Prefab or Muzzle Spawn Position is not assigned!");
         }
     }
+
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -238,12 +258,24 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Star collected!");
             currentScore++;
             UpdateScoreUI();
+
+            // Phát âm thanh nhặt sao
+            if (starCollectClip != null && audioSource != null)
+            {
+                audioSource.PlayOneShot(starCollectClip);
+            }
+            else
+            {
+                Debug.LogWarning("Star collect clip hoặc AudioSource chưa được gán!");
+            }
+
             if (GameManager.instance != null)
             {
                 GameManager.instance.StarCollected();
             }
         }
     }
+
 
     private void UpdateScoreUI()
     {

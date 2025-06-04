@@ -33,8 +33,8 @@ public class EnemyController : MonoBehaviour
         if (playerController != null)
         {
             // Hướng di chuyển: Enemy thường di chuyển XUỐNG.
-            // Nếu bạn muốn chúng di chuyển xuống, hãy đổi Vector3.up thành Vector3.down.
-            transform.Translate(Vector3.down * playerController.EnemySpeed * Time.deltaTime);
+            // Nếu bạn muốn chúng di chuyển xuống, hãy đổi Vector3.up thành Vector3.down. Nó up mới di chuyển xuống
+            transform.Translate(Vector3.up * playerController.EnemySpeed * Time.deltaTime);
         }
         else
         {
