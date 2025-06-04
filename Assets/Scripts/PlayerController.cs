@@ -97,8 +97,11 @@ public class PlayerController : MonoBehaviour
 
         currentScore = 0;
         UpdateScoreUI();
-    }
 
+        // Set level based on scene
+        level = SceneManager.GetActiveScene().buildIndex;
+        LoadHighScore();
+    }
     private void Update()
     {
         if (isGameOver) return;
@@ -286,64 +289,103 @@ public class PlayerController : MonoBehaviour
     private void LoadHighScore()
     {
         string filePath = Path.Combine(Application.persistentDataPath, highScoreFileName);
+        highScoreData = new HighScoreData(); // Initialize with empty Scores list
+
         if (File.Exists(filePath))
         {
             try
             {
                 string jsonData = File.ReadAllText(filePath);
-                highScoreData = JsonUtility.FromJson<HighScoreData>(jsonData);
-                Debug.Log("High score loaded from " + filePath + $": Username={highScoreData.Username}, Level={highScoreData.Level}, Score={highScoreData.Score}");
+                HighScoreData loadedData = JsonUtility.FromJson<HighScoreData>(jsonData);
+                if (loadedData != null && loadedData.Scores != null)
+                {
+                    highScoreData = loadedData;
+                    Debug.Log($"High score loaded from {filePath}: {highScoreData.Scores.Count} levels");
+                }
+                else
+                {
+                    Debug.LogWarning("Loaded high score data is invalid, initializing defaults.");
+                    InitializeDefaultHighScore();
+                    SaveHighScore();
+                }
             }
             catch (Exception e)
             {
-                Debug.LogError("Failed to load high score from " + filePath + ": " + e.Message);
+                Debug.LogError($"Failed to load high score from {filePath}: {e.Message}");
+                InitializeDefaultHighScore();
+                SaveHighScore();
             }
         }
         else
         {
-            highScoreData = new HighScoreData { Username = "N/A", Level = 1, Score = 0 };
-            SaveHighScore(); // Create default high score file
-            Debug.Log("No high score file found at " + filePath + ", created default.");
+            Debug.Log($"No high score file found at {filePath}, creating default.");
+            InitializeDefaultHighScore();
+            SaveHighScore();
         }
+    }
+    private void InitializeDefaultHighScore()
+    {
+        highScoreData = new HighScoreData();
+        highScoreData.Scores.Add(new HighScoreData.LevelScore { Username = "N/A", Level = 1, Score = 0 });
+        highScoreData.Scores.Add(new HighScoreData.LevelScore { Username = "N/A", Level = 2, Score = 0 });
     }
 
     private void SaveHighScore()
     {
-        // Kiểm tra xem có lập kỷ lục mới không
-        bool isNewRecord = (highScoreData == null || currentScore > highScoreData.Score);
+        if (highScoreData == null)
+        {
+            Debug.LogWarning("highScoreData is null, initializing default.");
+            InitializeDefaultHighScore();
+        }
+
+        var levelScore = highScoreData.Scores.Find(s => s.Level == level);
+        bool isNewRecord = (levelScore == null || currentScore > levelScore.Score);
 
         if (isNewRecord)
         {
-            highScoreData = new HighScoreData { Username = "You", Level = level, Score = currentScore };
+            if (levelScore == null)
+            {
+                levelScore = new HighScoreData.LevelScore { Username = username, Level = level, Score = currentScore };
+                highScoreData.Scores.Add(levelScore);
+            }
+            else
+            {
+                levelScore.Username = username;
+                levelScore.Score = currentScore;
+            }
+
             string filePath = Path.Combine(Application.persistentDataPath, highScoreFileName);
-            string jsonData = JsonUtility.ToJson(highScoreData);
+            string jsonData = JsonUtility.ToJson(highScoreData, true);
             try
             {
                 File.WriteAllText(filePath, jsonData);
-                Debug.Log("New high score saved to " + filePath + $" - Username: {username}, Level: {level}, Score: {currentScore}");
+                Debug.Log($"New high score saved for Level {level}: {currentScore}");
 
-                // Phát âm thanh New Record
                 if (newRecordClip != null && audioSource != null)
                     audioSource.PlayOneShot(newRecordClip);
 
-                // Hiển thị UI New Record
                 if (newRecordUI != null)
                 {
-                    newRecordUI.text = "NEW RECORD: " + currentScore.ToString();
+                    newRecordUI.text = $"NEW RECORD (Level {level}): {currentScore}";
                     newRecordUI.gameObject.SetActive(true);
-                    StartCoroutine(HideNewRecordUI(3f)); // Ẩn sau 3 giây
+                    StartCoroutine(HideNewRecordUI(3f));
                 }
-                else Debug.LogWarning("New Record UI Text (TMP_Text) is not assigned, cannot display new record message!");
-
+                else
+                {
+                    Debug.LogWarning("New Record UI Text (TMP_Text) is not assigned, cannot display new record message!");
+                }
             }
             catch (Exception e)
             {
-                Debug.LogError("Failed to save high score to " + filePath + ": " + e.Message);
+                Debug.LogError($"Failed to save high score to {filePath}: {e.Message}");
             }
         }
-        else Debug.Log($"Current score ({currentScore}) is not higher than the high score ({highScoreData.Score}).");
+        else
+        {
+            var currentHighScore = levelScore != null ? levelScore.Score : 0;
+            Debug.Log($"Current score ({currentScore}) is not higher than the high score ({currentHighScore}) for Level {level}.");
+        }
     }
-
     // Coroutine để ẩn newRecordUI sau một thời gian
     private IEnumerator HideNewRecordUI(float delay)
     {

@@ -6,12 +6,17 @@ using System.Threading.Tasks;
 
 namespace Assets.Scripts
 {
-
-    [Serializable]
+    [System.Serializable]
     public class HighScoreData
     {
-        public string Username;
-        public int Level;
-        public int Score;
+        public List<LevelScore> Scores = new List<LevelScore>();
+
+        [System.Serializable]
+        public class LevelScore
+        {
+            public string Username;
+            public int Level;
+            public int Score;
+        }
     }
 }
