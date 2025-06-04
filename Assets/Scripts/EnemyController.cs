@@ -52,18 +52,14 @@ public class EnemyController : MonoBehaviour
 
     // Phương thức xử lý va chạm của Enemy
     // Đảm bảo Collider2D của Enemy và Bullet đều là "Is Trigger"
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        // Kiểm tra xem đối tượng va chạm có phải là đạn của người chơi không
-        // Giả sử đạn của người chơi có Tag là "Bullet"
-        if (collision.CompareTag("Bullet"))
+        if (collision.gameObject.CompareTag("Untagged"))
         {
             // Phát âm thanh khi kẻ địch bị phá hủy
             if (destroySoundClip != null)
             {
-                // Sử dụng AudioSource.PlayClipAtPoint để phát âm thanh tại vị trí kẻ địch nổ
-                // và không cần AudioSource component trên kẻ địch
-                AudioSource.PlayClipAtPoint(destroySoundClip, transform.position);
+                AudioSource.PlayClipAtPoint(destroySoundClip, transform.position, 1.0f);
             }
             else
             {
@@ -78,10 +74,8 @@ public class EnemyController : MonoBehaviour
             Destroy(gameObject);           // Hủy kẻ địch
             Debug.Log("Kẻ địch bị phá hủy bởi đạn.");
         }
-        // Có thể thêm các logic va chạm khác ở đây (ví dụ: với Player)
-        // Lưu ý: Nếu PlayerController cũng có OnCollisionEnter2D hoặc OnTriggerEnter2D để xử lý va chạm với Enemy,
-        // bạn cần đảm bảo logic không bị trùng lặp hoặc mâu thuẫn.
     }
+
 
     public void DropLoot()
     {

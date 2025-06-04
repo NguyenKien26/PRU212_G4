@@ -150,4 +150,5 @@ MonoBehaviour:
   lootTable:
   - itemPrefab: {fileID: 6106479765750590611, guid: d06e25ac53cddae4bbce14d32c31b8a6, type: 3}
     dropChance: 49.7
-  speed: 0
+  destroySoundClip: {fileID: 8300000, guid: 89bfef0822401e6489832c2be4cf9baf, type: 3}
+  starPrefab: {fileID: 0}
