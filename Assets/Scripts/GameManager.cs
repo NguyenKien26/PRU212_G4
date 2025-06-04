@@ -3,12 +3,11 @@
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-    //Asteroid
+    // Asteroid
     public GameObject asteroidPrefab;
     public float asteroidDestroyTime = 10f;
 
-
-    //Enemy
+    // Enemy
     public GameObject enemyPrefab;
     public float enemyDestroyTime = 10f;
 
@@ -18,14 +17,21 @@ public class GameManager : MonoBehaviour
     [Header("Particle Effects")]
     public GameObject explosion;
     public GameObject muzzleFlash;
-    [SerializeField] public GameObject starPrefab; // Prefab cho ngôi sao
+    [SerializeField] public GameObject starPrefab;
 
     [Header("Star Settings")]
     [SerializeField] private float starSpawnChance;
+    private int currentStarCount = 0;
+    private PlayerController playerController;
 
     public void Awake()
     {
         instance = this;
+        playerController = Object.FindAnyObjectByType<PlayerController>();
+        if (playerController == null)
+        {
+            Debug.LogError("GameManager: PlayerController not found in the scene!");
+        }
     }
 
     void Start()
@@ -40,28 +46,37 @@ public class GameManager : MonoBehaviour
         GameObject asteroid = Instantiate(asteroidPrefab, asteroidpos, Quaternion.identity);
         Destroy(asteroid, asteroidDestroyTime);
     }
+
     public void AsteroidDestroyed(Vector3 position)
     {
         Debug.Log("Asteroid destroyed at position: " + position);
 
-        //float randomValue = Random.Range(0f, 1f);
-        //if (randomValue <= 0.3f)
-        //{
-            if (starPrefab != null)
+        if (playerController != null && currentStarCount < playerController.MaxStarCount)
+        {
+            float randomValue = Random.Range(0f, 1f);
+            if (randomValue <= starSpawnChance && starPrefab != null)
             {
                 GameObject star = Instantiate(starPrefab, position, Quaternion.identity);
-                star.GetComponent<Collider2D>().isTrigger = true; // Đảm bảo có thể nhặt ngôi sao
-                //Destroy(star, 5f);
-                Debug.Log("Star spawned at position: " + position);
+                star.GetComponent<Collider2D>().isTrigger = true;
+                currentStarCount++;
+                Debug.Log("Star spawned at position: " + position + ", Current star count: " + currentStarCount);
             }
-            else
+            else if (starPrefab == null)
             {
                 Debug.LogError("starPrefab is NULL! Ensure it is assigned in Inspector.");
             }
-        //}
-        
+        }
+        else if (playerController == null)
+        {
+            Debug.LogError("GameManager: PlayerController is null, cannot access maxStarCount.");
+        }
     }
-        //AddScore(5);
+
+    public void StarCollected()
+    {
+        currentStarCount = Mathf.Max(0, currentStarCount - 1);
+        Debug.Log("Star collected, Current star count: " + currentStarCount);
+    }
 
     void InstantiateEnemy()
     {

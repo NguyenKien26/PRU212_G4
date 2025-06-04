@@ -7,7 +7,6 @@ using UnityEngine.UI;
 using TMPro;
 using Assets.Scripts;
 
-
 public class PlayerController : MonoBehaviour
 {
     public static bool isGameOver;
@@ -16,8 +15,22 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject gamePauseScreen;
     [SerializeField] private float speed = 10.0f;
 
+    [Header("Level Settings")]
+    [SerializeField] private float asteroidSpeed = 5.0f; // Speed of asteroids for level customization
+    [SerializeField] private float enemySpeed = 3.0f;    // Speed of enemies for level customization
+    [SerializeField] private int maxStarCount = 10;      // Maximum number of collectible stars in the level
+
+    public float AsteroidSpeed => asteroidSpeed;
+    public float EnemySpeed => enemySpeed;
+    public int MaxStarCount => maxStarCount;
+
     [Header("Audio")]
     [SerializeField] private AudioClip gameOverClip;
+    [SerializeField] private AudioClip lazerClip;
+    [SerializeField] private AudioClip newRecordClip;
+    [SerializeField] private AudioClip hurtClip;
+    [SerializeField] private AudioClip asteroidExplosionClip;
+    [SerializeField] private AudioClip killEnermyClip;
     private AudioSource audioSource;
 
     [Header("Laser")]
@@ -26,8 +39,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float destroyTime = 5.0f;
     [SerializeField] private Transform muzzleSpawnPosition;
 
+    [SerializeField] private TMP_Text scoreTextUI;
 
-     [SerializeField] private TMP_Text scoreTextUI;
+    [SerializeField] private TMP_Text newRecordUI; 
 
     private bool isInvincible = false;
     private Vector3 respawnPosition;
@@ -35,10 +49,9 @@ public class PlayerController : MonoBehaviour
     private Collider2D col;
 
     private int currentScore = 0;
-    private int level = 1;
+    [SerializeField] private int level;
     private string username;
 
-    private readonly string playerScoreFileName = "player_score.json";
     private readonly string highScoreFileName = "high_score.json";
 
     private HighScoreData highScoreData;
@@ -70,11 +83,15 @@ public class PlayerController : MonoBehaviour
         if (gamePauseScreen != null) gamePauseScreen.SetActive(false);
         else Debug.LogWarning("Game Pause Screen GameObject is not assigned!");
 
+        // Khởi tạo trạng thái của newRecordUI
+        if (newRecordUI != null) newRecordUI.gameObject.SetActive(false); // Đảm bảo ban đầu nó ẩn
+        else Debug.LogWarning("New Record UI Text (TMP_Text) is not assigned!");
+
+
         username = SystemInfo.deviceName;
         if (string.IsNullOrEmpty(username)) username = "You";
 
-        LoadPlayerScore();
-        LoadHighScore();
+        currentScore = 0;
         UpdateScoreUI();
     }
 
@@ -84,21 +101,6 @@ public class PlayerController : MonoBehaviour
 
         PlayrMovement();
         PlayrShoot();
-
-        // Save current player data (score, level, username)
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            SavePlayerScore();
-            Debug.Log("Player data saved locally.");
-        }
-
-        // Load saved player data
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            LoadPlayerScore();
-            UpdateScoreUI();
-            Debug.Log("Player data loaded locally.");
-        }
     }
 
     private void PlayrMovement()
@@ -117,6 +119,8 @@ public class PlayerController : MonoBehaviour
                 GameObject laserInstance = Instantiate(laser, laserSpawnPosition.position, Quaternion.identity);
                 Destroy(laserInstance, destroyTime);
                 Debug.Log($"Laser fired at {laserSpawnPosition.position}.");
+                if (lazerClip != null && audioSource != null)
+                    audioSource.PlayOneShot(lazerClip);
             }
             else Debug.LogError("Laser Prefab or Laser Spawn Position is not assigned!");
 
@@ -136,6 +140,13 @@ public class PlayerController : MonoBehaviour
 
         if (collision.gameObject.CompareTag("Asteroids") || collision.gameObject.CompareTag("Enemy"))
         {
+            // Phát tiếng nổ thiên thạch/kẻ địch khi va chạm
+            if (asteroidExplosionClip != null)
+            {
+                // Sử dụng PlayClipAtPoint để phát âm thanh nổ tại vị trí va chạm
+                AudioSource.PlayClipAtPoint(asteroidExplosionClip, collision.transform.position);
+            }
+
             HeartManager.life--;
 
             if (HeartManager.life <= 0)
@@ -157,7 +168,14 @@ public class PlayerController : MonoBehaviour
 
                 gameObject.SetActive(false);
             }
-            else StartCoroutine(GetHurt());
+            else
+            {
+                // Phát tiếng người chơi bị thương (hurt)
+                if (hurtClip != null && audioSource != null)
+                    audioSource.PlayOneShot(hurtClip);
+
+                StartCoroutine(GetHurt());
+            }
         }
     }
 
@@ -197,10 +215,20 @@ public class PlayerController : MonoBehaviour
         isInvincible = false;
     }
 
-    public void ReplayGame() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    public void ReplayGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        // Đảm bảo newRecordUI ẩn khi chơi lại
+        if (newRecordUI != null) newRecordUI.gameObject.SetActive(false);
+    }
     public void PauseGame() { Time.timeScale = 0; if (gamePauseScreen != null) gamePauseScreen.SetActive(true); }
     public void ResumeGame() { Time.timeScale = 1; if (gamePauseScreen != null) gamePauseScreen.SetActive(false); }
-    public void MenuGame() => SceneManager.LoadScene("MainMenu");
+    public void MenuGame()
+    {
+        SceneManager.LoadScene("MainMenu");
+        // Đảm bảo newRecordUI ẩn khi về menu
+        if (newRecordUI != null) newRecordUI.gameObject.SetActive(false);
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -210,6 +238,10 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Star collected!");
             currentScore++;
             UpdateScoreUI();
+            if (GameManager.instance != null)
+            {
+                GameManager.instance.StarCollected();
+            }
         }
     }
 
@@ -217,52 +249,6 @@ public class PlayerController : MonoBehaviour
     {
         if (scoreTextUI != null) scoreTextUI.text = "Score: " + currentScore.ToString();
         else Debug.LogError("Score Text UI component is not assigned!");
-    }
-
-    private PlayerScoreData GetPlayerScoreData()
-    {
-        return new PlayerScoreData { Username = username, Level = level, Score = currentScore };
-    }
-
-    private void SavePlayerScore()
-    {
-        PlayerScoreData dataToSave = GetPlayerScoreData();
-        string filePath = Path.Combine(Application.persistentDataPath, playerScoreFileName);
-        string jsonData = JsonUtility.ToJson(dataToSave);
-        try
-        {
-            File.WriteAllText(filePath, jsonData);
-            Debug.Log("Player data saved to " + filePath);
-        }
-        catch (Exception e)
-        {
-            Debug.LogError("Failed to save player data to " + filePath + ": " + e.Message);
-        }
-    }
-
-    private void LoadPlayerScore()
-    {
-        string filePath = Path.Combine(Application.persistentDataPath, playerScoreFileName);
-        if (File.Exists(filePath))
-        {
-            try
-            {
-                string jsonData = File.ReadAllText(filePath);
-                PlayerScoreData loadedData = JsonUtility.FromJson<PlayerScoreData>(jsonData);
-                if (loadedData != null)
-                {
-                    username = loadedData.Username;
-                    level = loadedData.Level;
-                    currentScore = loadedData.Score;
-                    Debug.Log("Player data loaded from " + filePath + $": Username={username}, Level={level}, Score={currentScore}");
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogError("Failed to load player data from " + filePath + ": " + e.Message);
-            }
-        }
-        else Debug.Log("No player data file found at " + filePath);
     }
 
     private void LoadHighScore()
@@ -291,15 +277,32 @@ public class PlayerController : MonoBehaviour
 
     private void SaveHighScore()
     {
-        if (highScoreData == null || currentScore > highScoreData.Score)
+        // Kiểm tra xem có lập kỷ lục mới không
+        bool isNewRecord = (highScoreData == null || currentScore > highScoreData.Score);
+
+        if (isNewRecord)
         {
-            highScoreData = new HighScoreData { Username = username, Level = level, Score = currentScore };
+            highScoreData = new HighScoreData { Username = "You", Level = level, Score = currentScore };
             string filePath = Path.Combine(Application.persistentDataPath, highScoreFileName);
             string jsonData = JsonUtility.ToJson(highScoreData);
             try
             {
                 File.WriteAllText(filePath, jsonData);
                 Debug.Log("New high score saved to " + filePath + $" - Username: {username}, Level: {level}, Score: {currentScore}");
+
+                // Phát âm thanh New Record
+                if (newRecordClip != null && audioSource != null)
+                    audioSource.PlayOneShot(newRecordClip);
+
+                // Hiển thị UI New Record
+                if (newRecordUI != null)
+                {
+                    newRecordUI.text = "NEW RECORD: " + currentScore.ToString();
+                    newRecordUI.gameObject.SetActive(true);
+                    StartCoroutine(HideNewRecordUI(3f)); // Ẩn sau 3 giây
+                }
+                else Debug.LogWarning("New Record UI Text (TMP_Text) is not assigned, cannot display new record message!");
+
             }
             catch (Exception e)
             {
@@ -307,5 +310,15 @@ public class PlayerController : MonoBehaviour
             }
         }
         else Debug.Log($"Current score ({currentScore}) is not higher than the high score ({highScoreData.Score}).");
+    }
+
+    // Coroutine để ẩn newRecordUI sau một thời gian
+    private IEnumerator HideNewRecordUI(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (newRecordUI != null)
+        {
+            newRecordUI.gameObject.SetActive(false);
+        }
     }
 }

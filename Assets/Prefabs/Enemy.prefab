@@ -149,5 +149,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lootTable:
   - itemPrefab: {fileID: 6106479765750590611, guid: d06e25ac53cddae4bbce14d32c31b8a6, type: 3}
-    dropChance: 100
-  speed: 5
+    dropChance: 49.7
+  speed: 0
