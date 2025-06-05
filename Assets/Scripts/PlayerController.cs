@@ -240,17 +240,100 @@ public class PlayerController : MonoBehaviour
 
     public void ReplayGame()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        // Đảm bảo newRecordUI ẩn khi chơi lại
-        if (newRecordUI != null) newRecordUI.gameObject.SetActive(false);
+        // Dừng tất cả coroutine
+        StopAllCoroutines();
+
+        // Đặt lại Time.timeScale
+        Time.timeScale = 1;
+
+        // Ẩn newRecordUI nếu tồn tại
+        if (newRecordUI != null)
+        {
+            newRecordUI.gameObject.SetActive(false);
+        }
+        else
+        {
+            Debug.LogError("newRecordUI is not assigned in Inspector!");
+        }
+
+        Debug.Log($"Reloading scene: {SceneManager.GetActiveScene().buildIndex}");
+
+        try
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to reload scene: {e.Message}");
+        }
     }
-    public void PauseGame() { Time.timeScale = 0; if (gamePauseScreen != null) gamePauseScreen.SetActive(true); }
-    public void ResumeGame() { Time.timeScale = 1; if (gamePauseScreen != null) gamePauseScreen.SetActive(false); }
+
+    // Sửa coroutine HideNewRecordUI để sử dụng WaitForSecondsRealtime
+    private IEnumerator HideNewRecordUI(float delay)
+    {
+        yield return new WaitForSecondsRealtime(delay);
+        if (newRecordUI != null)
+        {
+            newRecordUI.gameObject.SetActive(false);
+        }
+        else
+        {
+            Debug.LogError("newRecordUI is not assigned when hiding!");
+        }
+    }
+    public void PauseGame()
+    {
+        Time.timeScale = 0;
+        if (gamePauseScreen != null)
+        {
+            gamePauseScreen.SetActive(true);
+        }
+        else
+        {
+            Debug.LogError("gamePauseScreen is not assigned in Inspector!");
+        }
+    }
+    public void ResumeGame()
+    {
+        Time.timeScale = 1;
+        if (gamePauseScreen != null)
+        {
+            gamePauseScreen.SetActive(false);
+        }
+        else
+        {
+            Debug.LogError("gamePauseScreen is not assigned in Inspector!");
+        }
+    }
     public void MenuGame()
     {
-        SceneManager.LoadScene("MainMenu");
-        // Đảm bảo newRecordUI ẩn khi về menu
-        if (newRecordUI != null) newRecordUI.gameObject.SetActive(false);
+        // Dừng tất cả coroutine để tránh truy cập đối tượng đã hủy
+        StopAllCoroutines();
+
+        // Đặt lại Time.timeScale trước khi chuyển cảnh
+        Time.timeScale = 1;
+
+        // Ẩn newRecordUI nếu tồn tại
+        if (newRecordUI != null)
+        {
+            newRecordUI.gameObject.SetActive(false);
+        }
+        else
+        {
+            Debug.LogError("newRecordUI is not assigned in Inspector!");
+        }
+
+        // Ghi log để debug
+        Debug.Log("Loading MainMenu scene");
+
+        try
+        {
+            SceneManager.LoadScene("MainMenu");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to load MainMenu scene: {e.Message}");
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -368,7 +451,7 @@ public class PlayerController : MonoBehaviour
                 {
                     newRecordUI.text = $"NEW RECORD (Level {level}): {currentScore}";
                     newRecordUI.gameObject.SetActive(true);
-                    StartCoroutine(HideNewRecordUI(3f));
+                    //StartCoroutine(HideNewRecordUI(3f));
                 }
                 else
                 {
@@ -394,15 +477,6 @@ public class PlayerController : MonoBehaviour
             {
                 Debug.LogWarning("New Record UI Text (TMP_Text) is not assigned, cannot display highest score message!");
             }
-        }
-    }
-    // Coroutine để ẩn newRecordUI sau một thời gian
-    private IEnumerator HideNewRecordUI(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        if (newRecordUI != null)
-        {
-            newRecordUI.gameObject.SetActive(false);
         }
     }
 }
