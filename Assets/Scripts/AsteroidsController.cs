@@ -23,7 +23,7 @@ public class AsteroidsController : MonoBehaviour
 
         if (playerController == null)
         {
-            Debug.LogError("AsteroidsController: PlayerController không tìm thấy trong scene!");
+            //Debug.LogError("AsteroidsController: PlayerController không tìm thấy trong scene!");
         }
 
         if (spriteRenderer == null)

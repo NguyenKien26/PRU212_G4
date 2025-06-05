@@ -78,7 +78,7 @@ public class PlayerController : MonoBehaviour
         if (audioSource == null)
         {
             audioSource = gameObject.AddComponent<AudioSource>();
-            Debug.LogWarning("AudioSource auto-added.");
+            //Debug.LogWarning("AudioSource auto-added.");
         }
 
         // Setup engine audio
@@ -384,6 +384,16 @@ public class PlayerController : MonoBehaviour
         {
             var currentHighScore = levelScore != null ? levelScore.Score : 0;
             Debug.Log($"Current score ({currentScore}) is not higher than the high score ({currentHighScore}) for Level {level}.");
+            if (newRecordUI != null)
+            {
+                newRecordUI.text = $"HIGHEST SCORE (Level {level}): {currentHighScore}";
+                newRecordUI.gameObject.SetActive(true);
+                StartCoroutine(HideNewRecordUI(3f));
+            }
+            else
+            {
+                Debug.LogWarning("New Record UI Text (TMP_Text) is not assigned, cannot display highest score message!");
+            }
         }
     }
     // Coroutine để ẩn newRecordUI sau một thời gian

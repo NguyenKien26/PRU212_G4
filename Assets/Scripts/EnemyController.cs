@@ -24,7 +24,7 @@ public class EnemyController : MonoBehaviour
         playerController = Object.FindAnyObjectByType<PlayerController>();
         if (playerController == null)
         {
-            Debug.LogError("EnemyController: PlayerController not found in the scene!");
+            //Debug.LogError("EnemyController: PlayerController not found in the scene!");
         }
     }
 
@@ -38,7 +38,7 @@ public class EnemyController : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("EnemyController: PlayerController is null, cannot access enemySpeed. Enemy will not move.");
+            //Debug.LogWarning("EnemyController: PlayerController is null, cannot access enemySpeed. Enemy will not move.");
         }
 
         // Logic để hủy Enemy nếu nó đi ra khỏi màn hình (ví dụ: dưới đáy màn hình)
