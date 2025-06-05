@@ -27,4 +27,11 @@ public class MenuManager : MonoBehaviour
     {
         settingPopup.SetActive(true);
     }
+    public void QuitGame()
+    {
+      Application.Quit();
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
+    }
 }
