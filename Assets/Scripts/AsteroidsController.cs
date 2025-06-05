@@ -19,7 +19,7 @@ public class AsteroidsController : MonoBehaviour
     private void Start()
     {
         playerController = Object.FindAnyObjectByType<PlayerController>();
-        spriteRenderer = GetComponentInChildren<SpriteRenderer>(); // lấy sprite con (hoặc GetComponent nếu trên cùng object)
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>(); 
 
         if (playerController == null)
         {
@@ -45,14 +45,10 @@ public class AsteroidsController : MonoBehaviour
     private void Update()
     {
         if (isDestroyed) return;
-
-        // Xoay sprite riêng (không xoay cả object)
         if (spriteRenderer != null)
         {
             spriteRenderer.transform.Rotate(0f, 0f, rotationSpeed * Time.deltaTime);
         }
-
-        // Di chuyển thiên thạch thẳng xuống (toàn bộ object)
         if (playerController != null)
         {
             transform.Translate(Vector3.down * playerController.AsteroidSpeed * Time.deltaTime, Space.World);

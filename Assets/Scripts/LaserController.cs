@@ -19,7 +19,6 @@ public class LaserController : MonoBehaviour
                     Destroy(gm, 2f);
                 }
 
-                // Nếu là Enemy thì gọi DropLoot
                 if (collision.gameObject.CompareTag("Enemy"))
                 {
                     EnemyController enemy = collision.gameObject.GetComponent<EnemyController>();
@@ -29,8 +28,8 @@ public class LaserController : MonoBehaviour
                     }
                 }
 
-                Destroy(this.gameObject);             // Hủy laser
-                Destroy(collision.gameObject);        // Hủy enemy
+                Destroy(this.gameObject);             
+                Destroy(collision.gameObject);        
             }
         }
     }

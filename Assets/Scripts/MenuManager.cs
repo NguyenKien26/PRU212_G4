@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 
 public class MenuManager : MonoBehaviour
 {
-    public GameObject instructionsPanel; // Gán từ Inspector
+    public GameObject instructionsPanel;
     public GameObject instructionButton;
     public GameObject settingPopup;
 
