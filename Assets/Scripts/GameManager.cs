@@ -3,7 +3,7 @@
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-    // Asteroid
+
     public GameObject asteroidPrefab;
     public float asteroidDestroyTime = 10f;
 

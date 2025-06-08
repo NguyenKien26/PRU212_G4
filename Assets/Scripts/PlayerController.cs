@@ -16,9 +16,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float speed = 10.0f;
 
     [Header("Level Settings")]
-    [SerializeField] private float asteroidSpeed = 5.0f; // Speed of asteroids for level customization
-    [SerializeField] private float enemySpeed = 3.0f;    // Speed of enemies for level customization
-    [SerializeField] private int maxStarCount = 10;      // Maximum number of collectible stars in the level
+    [SerializeField] private float asteroidSpeed = 5.0f; 
+    [SerializeField] private float enemySpeed = 3.0f;    
+    [SerializeField] private int maxStarCount = 10;      
 
     public float AsteroidSpeed => asteroidSpeed;
     public float EnemySpeed => enemySpeed;
@@ -78,10 +78,8 @@ public class PlayerController : MonoBehaviour
         if (audioSource == null)
         {
             audioSource = gameObject.AddComponent<AudioSource>();
-            //Debug.LogWarning("AudioSource auto-added.");
         }
 
-        // Setup engine audio
         engineAudioSource = gameObject.AddComponent<AudioSource>();
         engineAudioSource.clip = engineClip;
         engineAudioSource.loop = true;
@@ -98,7 +96,6 @@ public class PlayerController : MonoBehaviour
         currentScore = 0;
         UpdateScoreUI();
 
-        // Set level based on scene
         level = SceneManager.GetActiveScene().buildIndex;
         LoadHighScore();
     }
@@ -117,7 +114,6 @@ public class PlayerController : MonoBehaviour
         Vector3 movement = new Vector3(horizontalInput, verticalInput, 0) * speed * Time.deltaTime;
         transform.Translate(movement);
 
-        // Engine sound control
         if (engineAudioSource != null)
         {
             if (movement.magnitude > 0.01f)
@@ -134,7 +130,7 @@ public class PlayerController : MonoBehaviour
 
     private void PlayrShoot()
     {
-        if (!sr.enabled) return; // Nếu nhân vật chưa hồi sinh xong không cho bắn 
+        if (!sr.enabled) return;
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -163,10 +159,8 @@ public class PlayerController : MonoBehaviour
 
         if (collision.gameObject.CompareTag("Asteroids") || collision.gameObject.CompareTag("Enemy"))
         {
-            // Phát tiếng nổ thiên thạch/kẻ địch khi va chạm
             if (asteroidExplosionClip != null)
             {
-                // Sử dụng PlayClipAtPoint để phát âm thanh nổ tại vị trí va chạm
                 AudioSource.PlayClipAtPoint(asteroidExplosionClip, collision.transform.position);
             }
 
@@ -175,7 +169,7 @@ public class PlayerController : MonoBehaviour
             if (HeartManager.life <= 0)
             {
                 isGameOver = true;
-                SaveHighScore(); // Check and save high score on game over
+                SaveHighScore(); 
 
                 if (GameManager.instance != null && GameManager.instance.explosion != null)
                 {
@@ -193,7 +187,6 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                // Phát tiếng người chơi bị thương (hurt)
                 if (hurtClip != null && audioSource != null)
                     audioSource.PlayOneShot(hurtClip);
 
@@ -240,13 +233,10 @@ public class PlayerController : MonoBehaviour
 
     public void ReplayGame()
     {
-        // Dừng tất cả coroutine
         StopAllCoroutines();
 
-        // Đặt lại Time.timeScale
         Time.timeScale = 1;
 
-        // Ẩn newRecordUI nếu tồn tại
         if (newRecordUI != null)
         {
             newRecordUI.gameObject.SetActive(false);
@@ -268,7 +258,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // Sửa coroutine HideNewRecordUI để sử dụng WaitForSecondsRealtime
     private IEnumerator HideNewRecordUI(float delay)
     {
         yield return new WaitForSecondsRealtime(delay);
@@ -307,13 +296,10 @@ public class PlayerController : MonoBehaviour
     }
     public void MenuGame()
     {
-        // Dừng tất cả coroutine để tránh truy cập đối tượng đã hủy
         StopAllCoroutines();
 
-        // Đặt lại Time.timeScale trước khi chuyển cảnh
         Time.timeScale = 1;
 
-        // Ẩn newRecordUI nếu tồn tại
         if (newRecordUI != null)
         {
             newRecordUI.gameObject.SetActive(false);
@@ -323,7 +309,6 @@ public class PlayerController : MonoBehaviour
             Debug.LogError("newRecordUI is not assigned in Inspector!");
         }
 
-        // Ghi log để debug
         Debug.Log("Loading MainMenu scene");
 
         try
@@ -345,7 +330,6 @@ public class PlayerController : MonoBehaviour
             currentScore++;
             UpdateScoreUI();
 
-            // Phát âm thanh nhặt sao
             if (starCollectClip != null && audioSource != null)
             {
                 audioSource.PlayOneShot(starCollectClip);
@@ -372,7 +356,7 @@ public class PlayerController : MonoBehaviour
     private void LoadHighScore()
     {
         string filePath = Path.Combine(Application.persistentDataPath, highScoreFileName);
-        highScoreData = new HighScoreData(); // Initialize with empty Scores list
+        highScoreData = new HighScoreData();
 
         if (File.Exists(filePath))
         {
@@ -451,7 +435,6 @@ public class PlayerController : MonoBehaviour
                 {
                     newRecordUI.text = $"NEW RECORD (Level {level}): {currentScore}";
                     newRecordUI.gameObject.SetActive(true);
-                    //StartCoroutine(HideNewRecordUI(3f));
                 }
                 else
                 {
